@@ -31,7 +31,7 @@ index.html:
         <table id="contacts" class="table table-bordered"></table>
     </div>
 
-    <script src="js/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
@@ -65,13 +65,13 @@ js/script.js:
 Шаг 1. Настройка подключения к серверу
 --------------------------------------
 
-Подключим файл prostiezvonki.js: 
+Подключим файл prostiezvonki.js (свежую версию можно взять [отсюда](https://github.com/vedisoft/js-sdk)): 
 
 ```html
 <script src="js/prostiezvonki.js"></script>
 ```
 
-Для начала нужно скачать [тестовый сервер и диагностическую утилиту](https://github.com/vedisoft/pz-developer-tools).
+Теперь нужно скачать [тестовый сервер и диагностическую утилиту](https://github.com/vedisoft/pz-developer-tools).
 
 Запустим тестовый сервер:
 
