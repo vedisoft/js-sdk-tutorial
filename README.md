@@ -105,7 +105,7 @@ $('#button').on('click', function() {
         pz.connect({
             host: 'ws://localhost:10150', // Адрес сервера
             client_id: 'password',        // Пароль
-            client_type: 'tinycrm'        // Тип приложения
+            client_type: 'jssdk'          // Тип приложения
         });
     } else {
         pz.disconnect();
