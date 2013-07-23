@@ -28,7 +28,7 @@
         if ($(this).text() === 'Соединить') {
             pz.connect({
                 client_id: '102',
-                client_type: 'tinycrm',
+                client_type: 'jsapi',
                 host: "ws://localhost:10150"
             });
         } else {
