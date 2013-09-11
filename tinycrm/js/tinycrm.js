@@ -1,36 +1,53 @@
 (function ($) {
-    var userPhone = '102';
-
-    var storage = [
-        { name: 'Аркадий Аркадиевич Аркадьев', phone: '+7 (343) 0112233' },
-        { name: 'Борис Борисович Борисов', phone: '+7 (343) 0112244' },
-        { name: 'Валентина Валентиновна Валентинова', phone: '+7 (343) 0112255' },
-        { name: 'Константин Константинович Константинопольский', phone: '+7 (343) 0112266' }
-    ];
-
-    var table = $('#contacts');
+    var userPhone = '102',
+        storage = [
+            {
+                name:  'Аркадий Аркадиевич Аркадьев',
+                phone: '+7 (343) 0112233'
+            },
+            {
+                name:  'Борис Борисович Борисов',
+                phone: '+7 (343) 0112244'
+            },
+            {
+                name:  'Валентина Валентиновна Валентинова',
+                phone: '+7 (343) 0112255'
+            }
+        ];
 
     storage.forEach(function (contact) {
         $('<tr></tr>')
             .append('<td>' + contact.name + '</td>')
             .append('<td width="1%" nowrap><span title="Позвонить" class="btn-link make-call">' + contact.phone + '</span></td>')
-            .appendTo(table);
+            .appendTo('#contacts');
     });
 
     pz.setUserPhone(userPhone);
 
     pz.onEvent(function (event) {
-        if (event.isIncoming()) {
-            if (event.to === userPhone) {
-                showCard(event.from);
-            }
+        switch (true) {
+            case event.isIncoming():
+                if (event.to === userPhone) {
+                    showCard(event.from);
+                }
+                break;
+            case event.isTransfer():
+                if (findByPhone(storage, event.from)) {
+                    pz.transfer(event.callID, userPhone);
+                }
+                break;
+            case event.isHistory():
+                if (event.to === userPhone || event.from === userPhone) {
+                    appendCallInfo(event);
+                }
+                break;
         }
     });
 
     $('#button').on('click', function() {
         if ($(this).text() === 'Соединить') {
             pz.connect({
-                host: "ws://localhost:10150",
+                host: "ws://localhost",
                 client_id: 'password',
                 client_type: 'jsapi'
             });
@@ -56,11 +73,10 @@
     }, 1000);
 
     $('body').on('click', '.make-call', function() {
-        var phone = $(this).text().trim();
-
-        console.log('call '+phone);
-        pz.call(phone);
+        pz.call($(this).text());
     });
+
+    moment.lang('ru');
 
     function sanitizePhone(phone)
     {
@@ -95,5 +111,22 @@
             closeWith: ['button'],
             text: text
         });
+    }
+
+    function appendCallInfo(event) {
+        var direction = event.direction === '1' ? 'Исходящий' : 'Входящий',
+            phone     = event.direction === '1' ? event.to : event.from,
+            contact   = findByPhone(storage, phone),
+            name      = contact ? contact.name : '',
+            fromNow   = moment.unix(event.start).fromNow(),
+            duration  = moment.duration(event.duration, "seconds").humanize();
+
+        $('<tr></tr>')
+            .append('<td>' + direction + '</td>')
+            .append('<td>' + phone + '</td>')
+            .append('<td>' + name + '</td>')
+            .append('<td>' + fromNow + '</td>')
+            .append('<td>' + duration + '</td>')
+            .appendTo('#history');
     }
 }(jQuery));

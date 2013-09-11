@@ -15,12 +15,22 @@
 		<div style="display: none;" class="alert alert-info"></div>
 		<span id="button" class="btn pull-right">Соединить</span>
 		<span id="indicator" class="badge">Проверка соединения...</span>
+		<h2>История звонков</h2>
+		<table id="history" class="table table-bordered">
+			<th width="10%">Направление</th>
+			<th width="10%">Телефон</th>
+			<th width="40%">Клиент</th>
+			<th width="20%">Начало</th>
+			<th width="20%">Продолжительность</th>
+		</table>
 	</div>
 
 	<script src="js/jquery.min.js"></script>
 	<script src="js/noty/jquery.noty.js"></script>
 	<script src="js/noty/layouts/bottomRight.js"></script>
 	<script src="js/noty/themes/default.js"></script>
+	<script src="js/momentjs/moment.min.js"></script>
+	<script src="js/momentjs/lang/ru.js"></script>
 	<script src="js/prostiezvonki.js"></script>
 	<script src="js/tinycrm.js"></script>
 </body>
