@@ -1,24 +1,17 @@
 (function ($) {
-    var userPhone = '102',
+    var userPhone = '101',
         storage = [
-            {
-                name:  'Аркадий Аркадиевич Аркадьев',
-                phone: '+7 (343) 0112233'
-            },
-            {
-                name:  'Борис Борисович Борисов',
-                phone: '+7 (343) 0112244'
-            },
-            {
-                name:  'Валентина Валентиновна Валентинова',
-                phone: '+7 (343) 0112255'
-            }
+            { name: 'Аркадий', phone: '+7 (343) 0112233' },
+            { name: 'Борис', phone: '+7 (343) 0112244' },
+            { name: 'Валентина', phone: '+7 (343) 0112255' }
         ];
 
     storage.forEach(function (contact) {
+        var phoneLink = '<span class="btn-link make-call">' + contact.phone + '</span>';
+
         $('<tr></tr>')
             .append('<td>' + contact.name + '</td>')
-            .append('<td width="1%" nowrap><span title="Позвонить" class="btn-link make-call">' + contact.phone + '</span></td>')
+            .append('<td width="1%" nowrap>' + phoneLink + '</td>')
             .appendTo('#contacts');
     });
 
@@ -47,9 +40,9 @@
     $('#button').on('click', function() {
         if ($(this).text() === 'Соединить') {
             pz.connect({
-                host: "ws://localhost",
-                client_id: 'password',
-                client_type: 'jsapi'
+                host: "ws://localhost", // Адрес сервера
+                client_id: 'password',  // Пароль
+                client_type: 'jsapi'    // Тип приложения
             });
         } else {
             pz.disconnect();

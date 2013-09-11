@@ -6,12 +6,14 @@
 В данном примере мы рассмотрим процесс подключения к серверу Простых Звонков веб-приложения, написанного на javascript. Мы начнём с веб-приложения, выводящего на экран список клиентов из базы данных, и добавим в него следующие функции:
 
 - отображение всплывающей карточки при входящем звонке;
-- звонок клиенту по клику на телефоный номер.
+- звонок клиенту по клику на телефоный номер;
+- умная переадресация на менеджера клиента;
+- отображение истории входящих и исходящих звонков.
 
 Шаг 0. Исходное приложение
 --------------------------
 
-Наше исходное приложение умеет показывать список клиентов. В качестве базы данных используется массив storage, определяемый в файле js/script.js. Прочитанные из файла строки отображаются в виде таблицы.
+Наше исходное приложение умеет показывать список клиентов. В качестве базы данных используется массив storage, определяемый в файле js/tinycrm.js. Прочитанные из файла строки отображаются в виде таблицы.
 
 index.html:
 
@@ -23,6 +25,7 @@ index.html:
     <title>TinyCRM</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="css/tinycrm.css">
 </head>
 <body>
     <div class="container">
@@ -31,8 +34,8 @@ index.html:
         <table id="contacts" class="table table-bordered"></table>
     </div>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/tinycrm.js"></script>
 </body>
 </html>
 ```
@@ -42,21 +45,17 @@ js/script.js:
 ```js
 (function ($) {
     var storage = [
-        { name: 'Аркадий', phone: '+7 (343) 0112233' },
-        { name: 'Борис', phone: '+7 (343) 0112244' },
-        { name: 'Валентина', phone: '+7 (343) 0112255' }
-    ];
+            { name: 'Аркадий', phone: '+7 (343) 0112233' },
+            { name: 'Борис', phone: '+7 (343) 0112244' },
+            { name: 'Валентина', phone: '+7 (343) 0112255' }
+        ];
 
-    var table = $('#contacts');
-
-    for (var i = 0; i < storage.length; i += 1) {
-        var row = $('<tr></tr>');
-
-        row.append('<td>' + storage[i].name + '</td>');
-        row.append('<td width="1%" nowrap>' + storage[i].phone + '</td>');
-
-        row.appendTo(table);
-    }
+    storage.forEach(function (contact) {
+        $('<tr></tr>')
+            .append('<td>' + contact.name + '</td>')
+            .append('<td width="1%" nowrap>' + contact.phone + '</td>')
+            .appendTo('#contacts');
+    });
 }(jQuery));
 ```
 
@@ -103,9 +102,9 @@ js/script.js:
 $('#button').on('click', function() {
     if ($(this).text() === 'Соединить') {
         pz.connect({
-            host: 'ws://localhost:10150', // Адрес сервера
-            client_id: 'password',        // Пароль
-            client_type: 'jsapi'          // Тип приложения
+            host: 'ws://localhost', // Адрес сервера
+            client_id: 'password',  // Пароль
+            client_type: 'jsapi'    // Тип приложения
         });
     } else {
         pz.disconnect();
@@ -140,22 +139,31 @@ setInterval(function() {
 Шаг 2. Исходящие звонки кликом по номеру
 ----------------------------------------
 
-Для начала, сделаем номера телефонов клиентов ссылками:
+Для начала, сделаем номера телефонов клиентов ссылками. Для этого заменим код, отвечающий за заполнение таблицы с контактами:
 
 ```js
-row.append('<td width="1%" nowrap><span title="Позвонить" class="btn-link make-call">' + storage[i].phone + '</span></td>');
+storage.forEach(function (contact) {
+    var phoneLink = '<span class="btn-link make-call">' + contact.phone + '</span>';
+
+    $('<tr></tr>')
+        .append('<td>' + contact.name + '</td>')
+        .append('<td width="1%" nowrap>' + phoneLink + '</td>')
+        .appendTo('#contacts');
+}););
 ```
 
 ![Делаем телефоны ссылками](https://github.com/vedisoft/js-sdk-tutorial/raw/master/img/phone-links.png)
 
-Теперь добавим на страницу обработчики нажатия на ссылки:
+Теперь укажем внутренний номер сотрудника и добавим на страницу обработчик нажатий на ссылки:
 
 ```js
-$('body').on('click', '.make-call', function() {
-        var phone = $(this).text().trim();
+var userPhone = '101';
 
-        pz.call(phone);
-    });
+pz.setUserPhone(userPhone);
+
+$('body').on('click', '.make-call', function() {
+    pz.call($(this).text());
+});
 ```
 
 Кликнув на номер клиента, посмотрим на вывод тестового сервера:
@@ -169,10 +177,63 @@ Call event from CRM: src = 101, dst = +7 (343) 0112233
 Шаг 3. Всплывающая карточка входящего звонка
 --------------------------------------------
 
-На страницу поместим скрытый контейнер, который мы будем использовать в качестве всплывающей карточки:
+Для отображения всплывающих карточек воспользуемся плагином [jQuery Noty](http://needim.github.io/noty/).
 
-```html
-<div style="display: none;" class="alert alert-info"></div>
+Скачаем архив с плагином и распакуем его в папку `js/noty`. Теперь нужно подключить все необходимые файлы:
+
+```js
+<script src="js/noty/jquery.noty.js"></script>
+<script src="js/noty/layouts/bottomRight.js"></script>
+<script src="js/noty/themes/default.js"></script>
+```
+
+Подготовим функцию для поиска контактов по номеру телефона:
+
+```js
+function sanitizePhone(phone)
+{
+    return phone.replace(/\D/g, '').slice(-10);
+}
+
+function findByPhone(contacts, phone) {
+    return contacts.filter(function (contact) {
+        return sanitizePhone(contact.phone) === sanitizePhone(phone);
+    }).shift();
+}
+```
+
+> Как видите, мы воспользовались вспомогательной функцией для очистки номера телефона от посторонних символов и кода страны. Таким образом, поиск по номерам `+7 (343) 0112233` и `83430112233` будет выдавать одинаковый результат, что там и нужно.
+
+Теперь у нас есть вся необходимая информация, и мы можем заняться непосредственно отображением карточек. Подготовим две вариации шаблона карточки: для случая когда номер найден в базе, и когда он не найден:
+
+```js
+function getNotyText(phone, name) {
+    return '<span class="pz_noty_title">Входящий звонок</span>' +
+        (name ? '<span class="pz_noty_contact">' + name + '</span>' : '') +
+        '<span class="pz_noty_phone btn-link make-call">' + phone + '</span>' +
+        '<span class="pz_noty_copyright">' +
+            '<img src="img/pz.ico">' +
+            '<a target="_blank" href="http://prostiezvonki.ru">Простые звонки</a>' +
+        '</span>';
+}
+```
+
+Напишем функцию, при вызове которой в правом нижнем углу экрана будет появляться карточка. Чтобы не загромождать экран, при очередном звонке будем скрывать старую карточку.
+
+```js
+function showCard(phone) {
+    var contact = findByPhone(storage, phone);
+    var text = contact
+            ? getNotyText(contact.phone, contact.name)
+            : getNotyText(phone);
+
+    $.noty.closeAll();
+    noty({
+        layout: 'bottomRight',
+        closeWith: ['button'],
+        text: text
+    });
+}
 ```
 
 Осталось добавить функцию, которая будет вызываться при получении события от серевера. Мы будем показывать всплывающую карточку при получении события входящего звонка.
@@ -181,8 +242,12 @@ Call event from CRM: src = 101, dst = +7 (343) 0112233
 
 ```js
 pz.onEvent(function (event) {
-    if (event.isIncoming()) {
-        $('.alert').text('Звонок с '+event.from+' на '+event.to).show();
+    switch (true) {
+        case event.isIncoming():
+            if (event.to === userPhone) {
+                showCard(event.from);
+            }
+            break;
     }
 });
 ```
