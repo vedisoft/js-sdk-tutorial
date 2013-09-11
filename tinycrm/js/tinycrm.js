@@ -69,8 +69,6 @@
         pz.call($(this).text());
     });
 
-    moment.lang('ru');
-
     function sanitizePhone(phone)
     {
         return phone.replace(/\D/g, '').slice(-10);
@@ -106,13 +104,15 @@
         });
     }
 
+    moment.lang('ru');
+
     function appendCallInfo(event) {
         var direction = event.direction === '1' ? 'Исходящий' : 'Входящий',
             phone     = event.direction === '1' ? event.to : event.from,
             contact   = findByPhone(storage, phone),
             name      = contact ? contact.name : '',
-            fromNow   = moment.unix(event.start).fromNow(),
-            duration  = moment.duration(event.duration, "seconds").humanize();
+            fromNow   = moment.unix(parseInt(event.start)).fromNow(),
+            duration  = moment.duration(parseInt(event.duration), "seconds").humanize();
 
         $('<tr></tr>')
             .append('<td>' + direction + '</td>')
