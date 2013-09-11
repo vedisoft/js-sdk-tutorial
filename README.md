@@ -60,7 +60,7 @@ js/script.js:
 }(jQuery));
 ```
 
-![Исходное приложение](https://github.com/vedisoft/php-sdk-tutorial/raw/master/img/tinycrm-origin.png)
+![Исходное приложение](https://github.com/vedisoft/js-sdk-tutorial/raw/master/img/tinycrm-origin.png)
 
 Шаг 1. Настройка подключения к серверу
 --------------------------------------
@@ -95,7 +95,7 @@ js/script.js:
 
 Теперь наше приложение выглядит так:
 
-![Индикатор состояния соединения](https://github.com/vedisoft/php-sdk-tutorial/raw/master/img/connection-indicator.png)
+![Индикатор состояния соединения](https://github.com/vedisoft/js-sdk-tutorial/raw/master/img/connection-indicator.png)
 
 Добавим обработчик события кнопки. По нажатию кнопки будет выполнять запрос на подключение либо отключение соединения с сервером:
 
@@ -135,7 +135,7 @@ setInterval(function() {
 
 Попробуем подключиться к серверу:
 
-![Соединение установлено](https://github.com/vedisoft/php-sdk-tutorial/raw/master/img/connection-established.png)
+![Соединение установлено](https://github.com/vedisoft/js-sdk-tutorial/raw/master/img/connection-established.png)
 
 Шаг 2. Исходящие звонки кликом по номеру
 ----------------------------------------
@@ -146,7 +146,7 @@ setInterval(function() {
 row.append('<td width="1%" nowrap><span title="Позвонить" class="btn-link make-call">' + storage[i].phone + '</span></td>');
 ```
 
-![Делаем телефоны ссылками](https://github.com/vedisoft/php-sdk-tutorial/raw/master/img/phone-links.png)
+![Делаем телефоны ссылками](https://github.com/vedisoft/js-sdk-tutorial/raw/master/img/phone-links.png)
 
 Теперь добавим на страницу обработчики нажатия на ссылки:
 
@@ -195,7 +195,7 @@ pz.onEvent(function (event) {
 
 На странице приложения должна незамедлительно появиться карточка:
 
-![Карточка входящего звонка](https://github.com/vedisoft/php-sdk-tutorial/raw/master/img/incoming-popup.png)
+![Карточка входящего звонка](https://github.com/vedisoft/js-sdk-tutorial/raw/master/img/incoming-popup.png)
 
 Ура!
 ----
