@@ -1,0 +1,25 @@
+.noty_text > span {
+    display: block;
+}
+.pz_noty_copyright {
+    text-align: right;
+}
+.pz_noty_copyright a {
+    color: #777;
+    margin-left: .2em;
+    text-decoration: underline;
+}
+.pz_noty_copyright img {
+    opacity: .5;
+}
+.pz_noty_title {
+    margin-bottom: .7em;
+}
+.pz_noty_contact {
+    margin-bottom: .7em;
+    font-size: 1.2em;
+    line-height: 1.3em;
+}
+.pz_noty_phone.btn-link.make-call {
+    font-size: 1.1em;
+}
