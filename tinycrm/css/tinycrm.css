@@ -3,14 +3,16 @@
 }
 .pz_noty_copyright {
     text-align: right;
+    font-size: .9em;
 }
 .pz_noty_copyright a {
-    color: #777;
+    color: #999;
     margin-left: .2em;
     text-decoration: underline;
 }
 .pz_noty_copyright img {
-    opacity: .5;
+    opacity: .4;
+    width: 1em;
 }
 .pz_noty_title {
     margin-bottom: .7em;
@@ -20,6 +22,8 @@
     font-size: 1.2em;
     line-height: 1.3em;
 }
-.pz_noty_phone.btn-link.make-call {
+.pz_noty_phone {
     font-size: 1.1em;
+    text-decoration: underline;
+    margin-bottom: .7em;
 }
