@@ -39,6 +39,18 @@
         return this.type === '4';
     };
 
+    Event.prototype.isOutcoming = function () {
+        return this.type === '8';
+    };
+
+    Event.prototype.isOutcomingAnswer = function () {
+        return this.type === '16';
+    };
+
+    Event.prototype.isIncomingAnswer = function () {
+        return this.type === '32';
+    };
+
     Message = function (string, use_ssl) {
         if (!use_ssl) {
             string = atob(string);
@@ -78,7 +90,8 @@
             websocket  = null,
             host       = null,
             use_ssl    = false,
-            callbacks  = {};
+            callbacks  = {},
+            max_password_length = 32;
 
         function normalizeHost(host) {
             var defaults = {
@@ -97,6 +110,18 @@
             return host;
         }
 
+        function normalizePassword(password) {
+            return btoa(password || '');
+        }
+
+        this.version = '1.0.2';
+
+        /**
+         * Set user phone
+         * 
+         * @deprecated user phone should be set via params in connect method
+         * @param string phone
+         */
         this.setUserPhone = function (phone) {
             user_phone = phone;
         };
@@ -105,11 +130,23 @@
             host    = normalizeHost(params.host);
             use_ssl = host.indexOf('wss') === 0;
 
-            var connection_url = host
-                                 + '?CID=' + (params.client_id || 0)
-                                 + '&CT=' + params.client_type
-                                 + '&GID=' + user_phone;
+            if (params.client_id && params.client_id.length > max_password_length) {
+                return {
+                    result: 'error',
+                    text: 'Password exceeds max length of ' + max_password_length
+                };
+            }
 
+            user_phone = params.user_phone || user_phone;
+
+            var connection_url = host
+                                 + '?CID=' + normalizePassword(params.client_id)
+                                 + '&CT=' + params.client_type
+                                 + '&GID=' + user_phone
+                                 + '&PhoneNumber=' + user_phone
+                                 + '&BroadcastEventsMask=0'
+                                 + '&BroadcastGroup=' + (params.broadcast_group || '')
+                                 + '&PzProtocolVersion=1';
 
             websocket = new WebSocket(connection_url);
 
@@ -140,6 +177,10 @@
                         callbacks.onEvent(events[i]);
                     }
                 }
+            };
+
+            return {
+                result: 'ok'
             };
         };
 
@@ -172,11 +213,9 @@
         };
 
         this.transfer = function (call_id, number) {
-            number = number || 0;
-
             websocket.send(Message.prepareRequest(
                 'Transfer',
-                '<CallID>' + call_id + '</CallID><To>' + user_phone + '</To>',
+                '<CallID>' + call_id + '</CallID><To>' + (number || '') + '</To>',
                 use_ssl
             ));
         };

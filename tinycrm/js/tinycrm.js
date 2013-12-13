@@ -15,8 +15,6 @@
             .appendTo('#contacts');
     });
 
-    pz.setUserPhone(userPhone);
-
     pz.onEvent(function (event) {
         switch (true) {
             case event.isIncoming():
@@ -40,6 +38,7 @@
     $('#button').on('click', function() {
         if ($(this).text() === 'Соединить') {
             pz.connect({
+                user_phone: userPhone,  // Номер менеджера
                 host: "ws://localhost", // Адрес сервера
                 client_id: 'password',  // Пароль
                 client_type: 'jsapi'    // Тип приложения

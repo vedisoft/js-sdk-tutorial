@@ -160,7 +160,10 @@ storage.forEach(function (contact) {
 ```js
 var userPhone = '101';
 
-pz.setUserPhone(userPhone);
+pz.connect({
+    ...
+    user_phone: userPhone
+});
 
 $('body').on('click', '.make-call', function() {
     pz.call($(this).text());
