@@ -382,6 +382,59 @@ pz.onEvent(function (event) {
 Transfer Event: callID = 18467, to = 101
 ```
 
+Шаг 6. Отправка SMS (только для интеграций с Android)
+--------------------------
+
+Если интеграция производится с смартфонами на Android, то есть возможность отправлять SMS со смартфона пользователя.
+
+Добавляем форму для отправки SMS.
+```html
+<form>
+	<fieldset>
+		<h2>Отправка SMS <span class="help-block help-inline">(только для интеграций с Android)</span></h2>
+		<input class="input-small" type="text" name="sms-phone" placeholder="Телефон">
+		<input class="input-large" type="text" name="sms-text" placeholder="Текст">
+		<div id="button-send-sms" class="btn" style="display: block; width: fit-content;">Отправить SMS</div>
+	</fieldset>
+</form>
+```
+
+Добавим обработчик события кнопки отправки SMS.
+```js
+$('#button-send-sms').on('click', function() {
+    if (pz.isConnected()) {
+        var phone = $('input[name=sms-phone]').val();
+        var text = $('input[name=sms-text]').val();
+        pz.sms(phone, text);
+    } else {
+        showError("Нет соединения");
+    }
+});
+```
+
+Добавим обработку событий отправки SMS.
+```js
+pz.onEvent(function (event) {
+    switch (true) {
+        ...
+        
+        case event.isSmsStatus():
+            var phone = event.to;
+            if (event.result == '0') {
+                showMessage('Отправка СМС', 'СМС отправляется на номер ' + phone);
+            }
+            else if (event.result == '1') {
+                showMessage('Отправлена СМС', 'СМС успешно отправлена на номер ' + phone);
+            }
+            else {
+                showError('Не удалось отправить СМС на номер ' + phone)
+            }
+            break;
+    }
+});
+```
+
+Теперь можно отправлять SMS с телефона пользователя, в настройках Android приложения Простые Звонки которого указан тот же внутренний номер сотрудника, что и при подключении JS API.
 
 Ура!
 ----
