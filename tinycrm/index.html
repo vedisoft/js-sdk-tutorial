@@ -8,29 +8,37 @@
 	<link rel="stylesheet" href="css/tinycrm.css">
 </head>
 <body>
-	<div class="container">
-		<h1>TinyCRM</h1>
-		<h2>База клиентов</h2>
-		<table id="contacts" class="table table-bordered"></table>
-		<span id="button" class="btn pull-right">Соединить</span>
-		<span id="indicator" class="badge">Проверка соединения...</span>
-		<h2>История звонков</h2>
-		<table id="history" class="table table-bordered">
-			<th width="10%">Направление</th>
-			<th width="10%">Телефон</th>
-			<th width="30%">Клиент</th>
-			<th width="30%">Начало</th>
-			<th width="20%">Продолжительность</th>
-		</table>
-	</div>
+<div class="container">
+	<h1>TinyCRM</h1>
+	<h2>База клиентов</h2>
+	<table id="contacts" class="table table-bordered"></table>
+	<span id="button" class="btn pull-right">Соединить</span>
+	<span id="indicator" class="badge">Проверка соединения...</span>
+	<form>
+		<fieldset>
+			<h2>Отправка SMS <span class="help-block help-inline">(только для интеграций с Android)</span></h2>
+			<input class="input-small" type="text" name="sms-phone" placeholder="Телефон">
+			<input class="input-large" type="text" name="sms-text" placeholder="Текст">
+			<div id="button-send-sms" class="btn" style="display: block; width: fit-content;">Отправить SMS</div>
+		</fieldset>
+	</form>
+	<h2>История звонков</h2>
+	<table id="history" class="table table-bordered">
+		<th width="10%">Направление</th>
+		<th width="10%">Телефон</th>
+		<th width="30%">Клиент</th>
+		<th width="30%">Начало</th>
+		<th width="20%">Продолжительность</th>
+	</table>
+</div>
 
-	<script src="js/jquery.min.js"></script>
-	<script src="js/noty/jquery.noty.js"></script>
-	<script src="js/noty/layouts/bottomRight.js"></script>
-	<script src="js/noty/themes/default.js"></script>
-	<script src="js/momentjs/moment.min.js"></script>
-	<script src="js/momentjs/lang/ru.js"></script>
-	<script src="js/prostiezvonki.js"></script>
-	<script src="js/tinycrm.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/noty/jquery.noty.js"></script>
+<script src="js/noty/layouts/bottomRight.js"></script>
+<script src="js/noty/themes/default.js"></script>
+<script src="js/momentjs/moment.min.js"></script>
+<script src="js/momentjs/lang/ru.js"></script>
+<script src="js/prostiezvonki.js"></script>
+<script src="js/tinycrm.js"></script>
 </body>
 </html>
