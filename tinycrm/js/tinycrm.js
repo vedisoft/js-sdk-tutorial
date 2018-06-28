@@ -48,6 +48,20 @@
         }
     });
 
+    var lastDisconnectCode = -1;
+    pz.onDisconnect(function(error) {
+        if (error.code == 1000)// Стандартный код отключения WebSocket'а, не ошибка, пропускаем
+            return;
+
+        if (lastDisconnectCode == error.code)// Если ошибка повторяется, то не спамим её пользователю
+            return;
+        lastDisconnectCode = error.code;
+
+        var appError = pz.APPLICATION_ERRORS[error.code];
+        var errorText = appError ? appError.ru : 'Непредвиденная ошибка подключения';
+        showError(errorText);
+    });
+
     $('#button').on('click', function() {
         if ($(this).text() === 'Соединить') {
             pz.connect({
