@@ -32,6 +32,19 @@
                     appendCallInfo(event);
                 }
                 break;
+            case event.isSmsStatus():
+                var phone = event.to;
+
+                if (event.result == '0') {
+                    showMessage('Отправка СМС', 'СМС отправляется на номер ' + phone);
+                }
+                else if (event.result == '1') {
+                    showMessage('Отправлена СМС', 'СМС успешно отправлена на номер ' + phone);
+                }
+                else {
+                    showError('Не удалось отправить СМС на номер ' + phone)
+                }
+                break;
         }
     });
 
@@ -45,6 +58,16 @@
             });
         } else {
             pz.disconnect();
+        }
+    });
+
+    $('#button-send-sms').on('click', function() {
+        if (pz.isConnected()) {
+            var phone = $('input[name=sms-phone]').val();
+            var text = $('input[name=sms-text]').val();
+            pz.sms(phone, text);
+        } else {
+            showError("Нет соединения");
         }
     });
 
@@ -89,11 +112,42 @@
             '</span>';
     }
 
+    function getNotyMessage(title, text) {
+        return '<span class="pz_noty_title">' + title + '</span>' +
+            '<span>' + text + '</span>' +
+            '<span class="pz_noty_copyright">' +
+            '<img src="img/pz.ico">' +
+            '<a target="_blank" href="http://prostiezvonki.ru">Простые звонки</a>' +
+            '</span>';
+    }
+
     function showCard(phone) {
         var contact = findByPhone(storage, phone);
         var text = contact
                 ? getNotyText(contact.phone, contact.name)
                 : getNotyText(phone);
+
+        $.noty.closeAll();
+        noty({
+            layout: 'bottomRight',
+            closeWith: ['button'],
+            text: text
+        });
+    }
+    
+    function showError(text) {
+        var text = getNotyMessage('Ошибка', text);
+
+        $.noty.closeAll();
+        noty({
+            layout: 'bottomRight',
+            closeWith: ['button'],
+            text: text
+        });
+    }
+
+    function showMessage(title, text) {
+        var text = getNotyMessage(title, text);
 
         $.noty.closeAll();
         noty({
