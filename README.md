@@ -202,14 +202,16 @@ Call event from CRM: src = 101, dst = +7 (343) 0112233
 Шаг 4. Всплывающая карточка входящего звонка
 --------------------------------------------
 
-Для отображения всплывающих карточек воспользуемся плагином [jQuery Noty](http://needim.github.io/noty/).
+Для отображения всплывающих карточек воспользуемся плагином [notifyjs](https://notifyjs.jpillora.com/) и фирменным стилем.\
+Необходимая JS обертка и стили находятся в файлах `notification.css` и `notification.js`. 
 
-Скачаем архив с плагином и распакуем его в папку `js/noty`. Теперь нужно подключить все необходимые файлы:
+Скачаем архив с плагином и распакуем его в папку `js`. Теперь нужно подключить все необходимые файлы:
 
-```js
-<script src="js/noty/jquery.noty.js"></script>
-<script src="js/noty/layouts/bottomRight.js"></script>
-<script src="js/noty/themes/default.js"></script>
+```html
+<link rel="stylesheet" href="css/notification.css">
+
+<script src="js/notify.min.js"></script> <!--это и есть библиотека notifyjs-->
+<script src="js/notification.js"></script>
 ```
 
 Подготовим функцию для поиска контактов по номеру телефона:
@@ -229,36 +231,25 @@ function findByPhone(contacts, phone) {
 
 > Как видите, мы воспользовались вспомогательной функцией для очистки номера телефона от посторонних символов и кода страны. Таким образом, поиск по номерам `+7 (343) 0112233` и `83430112233` будет выдавать одинаковый результат, что там и нужно.
 
-Теперь у нас есть вся необходимая информация, и мы можем заняться непосредственно отображением карточек. Подготовим две вариации шаблона карточки: для случая когда номер найден в базе, и когда он не найден:
-
-```js
-function getNotyText(phone, name) {
-    return '<span class="pz_noty_title">Входящий звонок</span>' +
-        (name ? '<span class="pz_noty_contact">' + name + '</span>' : '') +
-        '<span class="pz_noty_phone btn-link make-call">' + phone + '</span>' +
-        '<span class="pz_noty_copyright">' +
-            '<img src="img/pz.ico">' +
-            '<a target="_blank" href="http://prostiezvonki.ru">Простые звонки</a>' +
-        '</span>';
-}
-```
-
-Напишем функцию, при вызове которой в правом нижнем углу экрана будет появляться карточка. Чтобы не загромождать экран, при очередном звонке будем скрывать старую карточку.
+Теперь у нас есть вся необходимая информация, и мы можем заняться непосредственно отображением карточек. Что бы показать карточку будем использовать методы из `notification.js`, передавая в них всю необходимую информацию для правильного отображения карточек.\
+Напишем функцию, при вызове которой в правом нижнем углу экрана будет появляться карточка.
 
 ```js
 function showCard(phone) {
-    var contact = findByPhone(storage, phone);
-    var text = contact
-            ? getNotyText(contact.phone, contact.name)
-            : getNotyText(phone);
+        var contact = findByPhone(storage, phone);
+        
+        var contactName;
+        var event;
+        if (contact) {
+            contactName = contact.name;
+            event = 'foundContact';
+        }
+        else {
+            event = 'notFoundContact';
+        }
 
-    $.noty.closeAll();
-    noty({
-        layout: 'bottomRight',
-        closeWith: ['button'],
-        text: text
-    });
-}
+        pzNoty.showNotificationContact(phone, null, 'incoming', contactName, null, event);
+    }
 ```
 
 Осталось добавить функцию, которая будет вызываться при получении события от серевера. Мы будем показывать всплывающую карточку при получении события входящего звонка.
@@ -442,10 +433,10 @@ pz.onEvent(function (event) {
         case event.isSmsStatus():
             var phone = event.to;
             if (event.result == '0') {
-                showMessage('Отправка СМС', 'СМС отправляется на номер ' + phone);
+                showMessage('СМС отправляется на номер ' + phone);
             }
             else if (event.result == '1') {
-                showMessage('Отправлена СМС', 'СМС успешно отправлена на номер ' + phone);
+                showMessage('СМС успешно отправлена на номер ' + phone);
             }
             else {
                 showError('Не удалось отправить СМС на номер ' + phone)

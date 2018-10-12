@@ -36,10 +36,10 @@
                 var phone = event.to;
 
                 if (event.result == '0') {
-                    showMessage('Отправка СМС', 'СМС отправляется на номер ' + phone);
+                    showMessage('СМС отправляется на номер ' + phone);
                 }
                 else if (event.result == '1') {
-                    showMessage('Отправлена СМС', 'СМС успешно отправлена на номер ' + phone);
+                    showMessage('СМС успешно отправлена на номер ' + phone);
                 }
                 else {
                     showError('Не удалось отправить СМС на номер ' + phone)
@@ -116,59 +116,28 @@
         }).shift();
     }
 
-    function getNotyText(phone, name) {
-        return '<span class="pz_noty_title">Входящий звонок</span>' +
-            (name ? '<span class="pz_noty_contact">' + name + '</span>' : '') +
-            '<span class="pz_noty_phone btn-link make-call">' + phone + '</span>' +
-            '<span class="pz_noty_copyright">' +
-                '<img src="img/pz.ico">' +
-                '<a target="_blank" href="http://prostiezvonki.ru">Простые звонки</a>' +
-            '</span>';
-    }
-
-    function getNotyMessage(title, text) {
-        return '<span class="pz_noty_title">' + title + '</span>' +
-            '<span>' + text + '</span>' +
-            '<span class="pz_noty_copyright">' +
-            '<img src="img/pz.ico">' +
-            '<a target="_blank" href="http://prostiezvonki.ru">Простые звонки</a>' +
-            '</span>';
-    }
-
     function showCard(phone) {
         var contact = findByPhone(storage, phone);
-        var text = contact
-                ? getNotyText(contact.phone, contact.name)
-                : getNotyText(phone);
 
-        $.noty.closeAll();
-        noty({
-            layout: 'bottomRight',
-            closeWith: ['button'],
-            text: text
-        });
+        var contactName;
+        var event;
+        if (contact) {
+            contactName = contact.name;
+            event = 'foundContact';
+        }
+        else {
+            event = 'notFoundContact';
+        }
+
+        pzNoty.showNotificationContact(phone, null, 'incoming', contactName, null, event);
     }
     
     function showError(text) {
-        var text = getNotyMessage('Ошибка', text);
-
-        $.noty.closeAll();
-        noty({
-            layout: 'bottomRight',
-            closeWith: ['button'],
-            text: text
-        });
+        pzNoty.showNotificationErrorMessage(text)
     }
 
-    function showMessage(title, text) {
-        var text = getNotyMessage(title, text);
-
-        $.noty.closeAll();
-        noty({
-            layout: 'bottomRight',
-            closeWith: ['button'],
-            text: text
-        });
+    function showMessage(text) {
+        pzNoty.showNotificationMessage(text)
     }
 
     moment.lang('ru');
